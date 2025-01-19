@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" />
+</head>
+<body>
+    <div style="background: linear-gradient(rgba(250, 238, 238, 0.5), rgba(148, 145, 145, 0.971)), url(https://images.pexels.com/photos/1118873/pexels-photo-1118873.jpeg?cs=srgb&dl=pexels-jplenio-1118873.jpg&fm=jpg); background-repeat: no-repeat; background-position: center; height: 100vh;">
+        <div class=" grid grid-cols-1 justify-items-center content-center h-full">
+            <div class="bg-gray-900 w-fit p-10 pt-4 rounded-lg">
+                <h1 class="mb-4 text-white text-lg font-medium text-center">CHECK WEATHER</h1>
+                <div>
+                    <input id="city" class="rounded-l-2xl p-1 bg-emerald-400 bg-opacity-25 outline-none text-white" placeholder="Search..." type="text">
+                    <button onclick="search()" type="button" class="rounded-r-2xl border-s-2 text-emerald border-white-800 p-1 bg-emerald-400  bg-opacity-25">
+                        <i class="fa-solid fa-magnifying-glass px-2"></i>
+                    </button>
+                    <div id="result" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const search = async () => {
+            try {
+                const cityInput = document.getElementById('city').value;
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = ""; // Clear previous results
+
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityInput}&appid=692d0b8426f3eaece45778f4c7b11a17`);
+                if (!response.ok) throw new Error("City not found");
+                const cityDetails = await response.json();
+
+                const tempCelsius = (cityDetails.main.feels_like - 273.15).toFixed(1);
+                const name = cityDetails.name;
+                const humidity = cityDetails.main.humidity;
+                const windSpeed = (cityDetails.wind.speed * 3.6).toFixed(1);
+
+                resultDiv.innerHTML = `
+                    <div class="grid grid-cols-1 content-center">
+                        <img class="justify-self-center" width="100px" src="https://cdn2.iconfinder.com/data/icons/weather-flat-14/64/weather04-1024.png" alt="Weather icon">
+                        <h1 class="text-center font-medium text-5xl text-yellow-600">${tempCelsius}°C</h1>
+                        <h2 class="text-center font-medium text-2xl text-slate-100">${name}</h2>
+                        <div class="flex justify-between mt-4">
+                            <div class="text-left">
+                                <h4 class="text-orange-700 font-medium text-xl">${humidity}%</h4>
+                                <h4 class="text-slate-100">Humidity</h4>
+                            </div>
+                            <div class="text-right">
+                                <h4 class="text-orange-700 font-medium text-xl">${windSpeed} km/h</h4>
+                                <h4 class="text-slate-100">Wind</h4>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(error.message);
+                document.getElementById('result').innerHTML = `<h4 class="text-red-600">City not found. Try again.</h4>`;
+            }
+        };
+    </script>
+</body>
+</html>
